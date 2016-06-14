@@ -1,0 +1,65 @@
+int motorPin = 13;
+int motorDriveTime = 60;
+EnergyManagement em;
+
+void loop()
+{  
+  long moisture =  cs_4_2.capacitiveSensor(100);
+  if (moisture < moistureTH) {
+    //電池残量が少なくなったら途中で駆動終了
+    //途中で電池切れの場合0を返し、フル稼働したら1を返す
+    //
+    if (ehDigitalWriteHigh(motorPin,motorDriveTime)) {
+      tweetMessage("have watered");
+    }
+  }else{
+  }
+  //電池残量が多ければdefaultTimeのスリープ、少なければ、ehDigitalWritHighが可能な電池残量まで貯める
+  EHdelay(defaultTime,"ehDigitalWritHigh",[motorPin,motorDriveTime]); 
+}
+
+ehDigitalWriteHigh
+  deigitarWriteを実行しながら、電池残量の変動を計測。
+  実行中に電池残量が少なくなったら駆動終了し0を返す、
+  second秒稼働できたら1を返す
+
+  電池残量が多ければdefaultTime時間スリープ、
+  少なければ、ehDigitalWritHighが可能な電池残量が貯めるまで待つ
+
+
+int motorPin = 13;
+int motorDriveTime = 60;
+
+void loop()
+{
+  long moisture =  cs.capacitiveSensor(100);
+  if (moisture < moistureTH) {
+    em.absoluteDigitalWrite(motorPin, motorDriveTime);
+    if (em.selectStart()) {
+      char* msg = "I have finished watering!";
+      tweetMessage(msg);
+      em.selectEnd();
+    }
+  }
+  delay(1000);
+}
+
+void loop()
+{  
+  long moisture =  cs.capacitiveSensor(100);
+  if (moisture < moistureTH) {
+    em.adjustDigitalWrite(motorPin,motorDriveTime);
+    if (em.absStart()) {
+      String msg = /*(String) em.timeOfAdjustDigitalWrite +*/ "seconds watering";
+      tweetMessage(msg);
+      em.absEnd();
+    }
+  }
+  delay(1000);
+}
+
+
+
+
+
+
